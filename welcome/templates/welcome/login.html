@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_bl %}Log In{% endblock %}
+
+{% block body_bl %}
+    <div class="container">
+        <div>
+            <p style="text-align: center;"><img src="{% static 'ballot/img/logo.png' %}"></p>
+            <h1 style="padding-bottom:5%; text-align: center">Blockchain Voting Log In</h1>
+
+        </div>
+        <form action="{% url 'welcome:user_login' %}" method="POST">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-left: 32%">
+                <div class="row col-md-12">
+                    <label for="voter-id-input" class="col-md-3">Email:</label>
+                    <input name="email" type="text" class="form-control col-md-4" id="first_name"
+                           placeholder="Email" autofocus>
+                </div>
+                <br>
+                <div class="row col-md-12">
+                    <label for="voter-id-input" class="col-md-3">Password:</label>
+                    <input name="password" type="password" class="form-control col-md-4" id="last_name"
+                           placeholder="Ppassword" autofocus>
+                </div>
+                <br>
+            </div>
+
+            <button type="submit" style="width: 25%; margin-left: 43%" class="btn btn-primary btn-block">Log in
+            </button>
+        </form>
+        <br>
+        <br>
+        <a style="margin-left: 36%;" href="{% url 'welcome:sign_up' %}">Don't having Login Credentials, click here to register yourself.</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,5 @@
+__pycache__
+.idea
+private_keys/*
+public_keys/*
+simulation/migrations/*.py

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_bl %}Sign Up{% endblock %}
+
+{% block body_bl %}
+    <div class="container">
+        <div>
+            <p style="text-align: center;"><img src="{% static 'ballot/img/logo.png' %}"></p>
+            <h1 style="padding-bottom:5%; text-align: center">Blockchain Voting Sign Up</h1>
+
+        </div>
+        <form action="{% url 'welcome:sign_up' %}" method="POST">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-left: 32%">
+                <div class="row col-md-12">
+                    <label for="voter-id-input" class="col-md-3">First Name:</label>
+                    <input name="first_name" type="text" class="form-control col-md-4" id="first_name"
+                           placeholder="Enter First name"  autofocus>
+                </div>
+                <br>
+                <div class="row col-md-12">
+                    <label for="voter-id-input" class="col-md-3">Last Name:</label>
+                    <input name="last_name" type="text" class="form-control col-md-4" id="last_name"
+                           placeholder="Enter Last name"  autofocus>
+                </div>
+                <br>
+                <div class="row col-md-12">
+                    <label for="voter-id-input" class="col-md-3">Email:</label>
+                    <input name="email" type="email" class="form-control col-md-4" id="email"
+                           placeholder="Enter Email"  autofocus>
+                </div>
+                <br>
+                <div class="row col-md-12">
+                    <label for="voter-id-input" class="col-md-3">Password:</label>
+                    <input name="password" type="password" class="form-control col-md-4" id="email"
+                           placeholder="Enter Password"  autofocus>
+                </div>
+{#                <div class="row col-md-12">#}
+{#                    <label for="voter-id-input" class="col-md-3">Contact Number:</label>#}
+{#                    <input name="contact_no" type="text" class="form-control col-md-4" id="contact_no"#}
+{#                           placeholder="Enter Contact Number"  autofocus>#}
+{#                </div>#}
+{#                <br>#}
+{#                <div class="row col-md-12">#}
+{#                    <label for="voter-id-input" class="col-md-3">Choose Gender:</label>#}
+{#                    <select class="browser-default custom-select form-control col-md-4" name="gender">#}
+{#                        <option selected disabled>Choose Gender</option>#}
+{#                        <option value="Male">Male</option>#}
+{#                        <option value="Female">Female</option>#}
+{#                        <option value="Other">Other</option>#}
+{#                    </select>#}
+{#                </div>#}
+{#                <br>#}
+{#                <div class="row col-md-12">#}
+{#                    <label for="voter-id-input" class="col-md-3">Address:</label>#}
+{#                    <textarea class="form-control col-md-4" name="address" placeholder="Enter Address"#}
+{#                              autofocus rows="3"></textarea>#}
+{#                </div>#}
+{#                <br>#}
+            </div>
+
+            <button type="submit" style="width: 25%; margin-left: 43%" class="btn btn-primary btn-block">Sign Up
+            </button>
+        </form>
+    </div>
+{% endblock %}
