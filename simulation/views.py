@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from .models import Vote, Block, VoteBackup
 from .merkle.merkle_tool import MerkleTools
 
+
 def generate(request):
     """Generate transactions and fill them with valid values."""
     number_of_transactions = settings.N_TRANSACTIONS
@@ -23,7 +24,7 @@ def generate(request):
     # Delete all blocks from previous demo.
     deleted_old_blocks = Block.objects.all().delete()[0]
     print("\nDeleted {} blocks from previous simulation.\n".format(deleted_old_blocks))
-    
+
     # Generate transactions.
     time_start = time.time()
     block_no = 1
@@ -38,19 +39,20 @@ def generate(request):
         # "Broadcast" to two nodes
         new_vote.save()
         new_backup_vote.save()
-        print("#{} new vote: {}".format(i, new_vote)) # for sanity
+        print("#{} new vote: {}".format(i, new_vote))  # for sanity
         if i % number_of_tx_per_block == 0:
             block_no += 1
     time_end = time.time()
     print('\nFinished in {} seconds.\n'.format(time_end - time_start))
 
     # View the generated transactions
-    votes = Vote.objects.order_by('-timestamp')[:100] # only shows the last 100, if any
+    votes = Vote.objects.order_by('-timestamp')[:100]  # only shows the last 100, if any
     context = {
         'votes': votes,
     }
     request.session['transactions_done'] = True
     return render(request, 'simulation/generate.html', context)
+
 
 def seal(request):
     """Seal the transactions generated previously."""
@@ -71,7 +73,7 @@ def seal(request):
         root.add_leaf([str(tx) for tx in block_transactions], True)
         root.make_tree()
         merkle_h = root.get_merkle_root()
-        
+
         # Try to seal the block and generate valid hash
         nonce = 0
         timestamp = datetime.datetime.now().timestamp()
@@ -94,6 +96,7 @@ def seal(request):
     print('\nFinished in {} seconds.\n'.format(time_end - time_start))
     return redirect('simulation:blockchain')
 
+
 def transactions(request):
     """See all transactions that have been contained in blocks."""
     vote_list = Vote.objects.all().order_by('timestamp')
@@ -103,7 +106,7 @@ def transactions(request):
     votes = paginator.get_page(page)
 
     hashes = [SHA3_256.new(str(v).encode('utf-8')).hexdigest() for v in votes]
-    
+
     # This happens if you don't use foreign key
     block_hashes = []
     for i in range(0, len(votes)):
@@ -113,16 +116,16 @@ def transactions(request):
         except:
             h = 404
         block_hashes.append(h)
-    
+
     # zip the three iters
-    votes_pg = votes # for pagination
+    votes_pg = votes  # for pagination
     votes = zip(votes, hashes, block_hashes)
-    
+
     # Calculate the voting result of 3 cands, the ugly way
     result = []
     for i in range(0, 3):
         try:
-            r = Vote.objects.filter(vote=i+1).count()
+            r = Vote.objects.filter(vote=i + 1).count()
         except:
             r = 0
         result.append(r)
@@ -134,6 +137,7 @@ def transactions(request):
     }
     return render(request, 'simulation/transactions.html', context)
 
+
 def blockchain(request):
     """See all mined blocks."""
     blocks = Block.objects.all().order_by('id')
@@ -141,6 +145,7 @@ def blockchain(request):
         'blocks': blocks,
     }
     return render(request, 'simulation/blockchain.html', context)
+
 
 def verify(request):
     """Verify transactions in all blocks by re-calculating the merkle root."""
@@ -152,7 +157,7 @@ def verify(request):
     for i in range(1, number_of_blocks + 1):
         # Select block #i
         b = Block.objects.get(id=i)
-        
+
         # Select all transactions in block #i
         transactions = Vote.objects.filter(block_id=i).order_by('timestamp')
 
@@ -161,7 +166,7 @@ def verify(request):
         root.add_leaf([str(tx) for tx in transactions], True)
         root.make_tree()
         merkle_h = root.get_merkle_root()
-        
+
         if b.merkle_h == merkle_h:
             message = 'Block {} verified.'.format(i)
         else:
@@ -169,10 +174,12 @@ def verify(request):
             corrupt_block_list += ' {}'.format(i)
         print('{}'.format(message))
     if len(corrupt_block_list) > 0:
-        messages.warning(request, 'The following blocks have corrupted transactions: {}.'.format(corrupt_block_list), extra_tags='bg-danger')
+        messages.warning(request, 'The following blocks have corrupted transactions: {}.'.format(corrupt_block_list),
+                         extra_tags='bg-danger')
     else:
         messages.info(request, 'All transactions in blocks are intact.', extra_tags='bg-info')
     return redirect('simulation:blockchain')
+
 
 def sync(request):
     """Restore transactions from honest node."""
@@ -185,6 +192,7 @@ def sync(request):
     print('\nSync complete.\n')
     messages.info(request, 'All blocks have been synced successfully.')
     return redirect('simulation:blockchain')
+
 
 def sync_block(request, block_id):
     """Restore transactions of a block from honest node."""
@@ -204,6 +212,7 @@ def sync_block(request, block_id):
     print('\nSync complete\n')
     return redirect('simulation:block_detail', block_hash=b.h)
 
+
 def block_detail(request, block_hash):
     """See the details of a block and its transactions."""
     # Select the block or 404
@@ -216,17 +225,17 @@ def block_detail(request, block_hash):
     page = request.GET.get('page')
     transactions = paginator.get_page(page)
     transactions_hashes = [SHA3_256.new(str(t).encode('utf-8')).hexdigest() for t in transactions]
-    
+
     # Check the integrity of transactions
     root = MerkleTools()
     root.add_leaf([str(tx) for tx in transaction_list], True)
     root.make_tree()
     merkle_h = root.get_merkle_root()
     tampered = block.merkle_h != merkle_h
-    
-    transactions_pg = transactions # for pagination
+
+    transactions_pg = transactions  # for pagination
     transactions = zip(transactions, transactions_hashes)
-    
+
     # Get prev and next block id
     prev_block = Block.objects.filter(id=block.id - 1).first()
     next_block = Block.objects.filter(id=block.id + 1).first()
@@ -244,9 +253,11 @@ def block_detail(request, block_hash):
 
     return render(request, 'simulation/block.html', context)
 
+
 # HELPER FUNCTIONS
 def _get_vote():
     return randint(1, 3)
+
 
 def _get_timestamp():
     return datetime.datetime.now().timestamp()

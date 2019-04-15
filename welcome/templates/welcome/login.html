@@ -39,7 +39,7 @@
                 <div class="row col-md-12">
                     <label for="voter-id-input" class="col-md-3">Password:</label>
                     <input name="password" type="password" class="form-control col-md-4" id="last_name"
-                           placeholder="Ppassword" autofocus>
+                           placeholder="Password" autofocus>
                 </div>
                 <br>
             </div>
@@ -47,7 +47,6 @@
             <button type="submit" style="width: 25%; margin-left: 38%" class="btn btn-primary btn-block">Log in
             </button>
         </form>
-        <br>
         <a style="margin-left: 32%;" href="{% url 'welcome:sign_up' %}">Don't having Login Credentials, click here to
             register yourself.</a>
     </div>
@@ -55,4 +54,13 @@
             integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
             crossorigin="anonymous"></script>
 
+{#    <script type="text/javascript">#}
+{#        $(document).ready(function () {#}
+{#            window.setTimeout(function () {#}
+{#                $("#success-alert").fadeTo(500, 0).slideUp(500, function () {#}
+{#                    $(this).remove();#}
+{#                });#}
+{#            }, 4000);#}
+{#        })#}
+{#    </script>#}
 {% endblock %}

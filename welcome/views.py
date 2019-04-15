@@ -37,26 +37,21 @@ def sign_up(request):
         # Generate Private key
         name = "{}_{}".format(user_obj.first_name, user_obj.last_name)
         key = ECC.generate(curve='P-256')
-        f = open('utils/private_' + name + '.pem', 'wt')
-        f.write(key.export_key(format='PEM'))
-        f.close()
+        private_key = key.export_key(format='PEM')
 
         print('**********************')
-        print(key.export_key(format='PEM'))
+        print(private_key)
         print('**********************')
 
         # Generate Public Key
-        os.system("openssl ec -in utils/private_" + name + ".pem -pubout -out utils/public_" + name + ".pem")
 
-        temp = open("utils/public_" + name + ".pem", "r")
-        user_details_obj.public_key = temp.read()
+        f = open('utils/public_' + name + '.pem', 'wt')
+        f.write(key.public_key().export_key(format='PEM'))
+        f.close()
+
+        user_details_obj.public_key = key.public_key().export_key(format='PEM')
         user_details_obj.save()
-        # Delete private key after generating public key
-        # try:
-        #     os.remove('utils/private_' + name + '.pem')
-        #     os.remove('utils/public_' + name + '.pem')
-        # except Exception as e:
-        #     pass
+
         messages.success(request, 'User Sign Up success..!')
         return redirect('/')
 
@@ -70,13 +65,11 @@ def user_login(request):
         password = request.POST.get('password')
         user = authenticate(username=username, password=password)
         if user is not None:
-            if user.is_active:
-                login(request, user)
-                return redirect('/home')
-            else:
-                return HttpResponse("Login Failed")
+            login(request, user)
+            return redirect('/home')
         else:
-            return HttpResponse("Invalid login")
+            messages.warning(request, "Invalid login")
+            return render(request, 'welcome/login.html')
     elif request.method == "GET":
         return render(request, 'welcome/login.html')
 
